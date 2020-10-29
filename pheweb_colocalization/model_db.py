@@ -84,11 +84,10 @@ class ColocalizationDAO(ColocalizationDB):
         def generate_colocalization():
             with gzip.open(path, "rt") if path.endswith("gz") else open(path, 'r') as csv_file:
                 reader = csv.reader(csv_file, delimiter='\t', )
-                expected_header = Colocalization.column_names()
 
                 if header:
                     actual_header = next(reader)
-                    assert Colocalization.IMPORT_COLUMN_NAMES == actual_header, \
+                    assert Colocalization.cvs_column_names() == actual_header, \
                         "header expected '{expected_header}' got '{actual_header}'".format(expected_header=expected_header,
                                                                                            actual_header=actual_header)
 
