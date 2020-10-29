@@ -2,7 +2,8 @@ import json
 from flask import Blueprint, current_app as app, g, request
 from finngen_common_data_model.genomics import Variant, Locus
 import re
-from colocalization.model import ColocalizationDB, SearchSummary, SearchResults, PhenotypeList, CausalVariantVector
+
+from pheweb_colocalization.model import CausalVariantVector, SearchSummary, SearchResults, PhenotypeList, ColocalizationDB
 
 colocalization = Blueprint('colocalization', __name__)
 development = Blueprint('development', __name__)

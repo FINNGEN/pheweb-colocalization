@@ -4,9 +4,12 @@ from flask import Flask, send_from_directory, request, g
 import logging
 import json
 import os
-from colocalization.cli import data_cli
-from colocalization.model_db import ColocalizationDAO
-from colocalization.view import colocalization, development
+from finngen_common_data_model.genomics import Variant, Locus
+from pheweb_colocalization.cli import data_cli
+
+from pheweb_colocalization.model_db import ColocalizationDAO
+
+from pheweb_colocalization.view import colocalization, development
 import atexit
 import sys
 

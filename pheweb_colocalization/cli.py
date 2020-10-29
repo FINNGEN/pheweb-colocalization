@@ -3,13 +3,14 @@ import click
 import os
 import typing
 import csv
-from colocalization.model_db import ColocalizationDAO
+
+from pheweb_colocalization.model_db import ColocalizationDAO
 from flask.cli import AppGroup, with_appcontext
 
 # TOOO : write documentation
 # TODO : fix name of dump
 
-data_cli = AppGroup('colocalization')
+data_cli = AppGroup('colocalization', short_help="Colocalization commands")
 
 def wrap(path,f):
     dao = ColocalizationDAO(db_url=path, parameters={})
