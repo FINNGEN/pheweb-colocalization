@@ -6,7 +6,7 @@ from finngen_common_data_model.genomics import Variant, Locus
 from finngen_common_data_model.colocalization import CausalVariant, Colocalization 
 
 from pheweb_colocalization.model import CausalVariantVector, SearchSummary, SearchResults, PhenotypeList, ColocalizationDB
-from pheweb_colocalization.model_mapper import create_metadata
+from pheweb_colocalization.model_mapper import ColocalizationMapping
 
 import csv
 import gzip
@@ -23,12 +23,6 @@ from sqlalchemy.sql import func
 csv.field_size_limit(sys.maxsize)
 
 class ColocalizationDAO(ColocalizationDB):
-    metadata = None
-    @staticmethod
-    def getMetaData():
-        if not ColocalizationDAO.metadata:
-            ColocalizationDAO.metadata = create_metadata()
-        return ColocalizationDAO.metadata
 
     @staticmethod
     def mysql_config(path : str) -> typing.Optional[str] :
@@ -55,7 +49,7 @@ class ColocalizationDAO(ColocalizationDB):
                                     echo=True,
                                     *parameters)
 
-        ColocalizationDAO.getMetaData().bind = self.engine
+        ColocalizationMapping.getMetadata().bind = self.engine
         self.Session = sessionmaker(bind=self.engine)
         self.support = DAOSupport(Colocalization)
 
@@ -64,7 +58,7 @@ class ColocalizationDAO(ColocalizationDB):
             self.engine.dispose()
 
     def create_schema(self):
-        return ColocalizationDAO.getMetaData().create_all(self.engine)
+        return ColocalizationMapping.getMetadata().create_all(self.engine)
 
     def dump(self):
         print(self.db_url)
@@ -72,11 +66,12 @@ class ColocalizationDAO(ColocalizationDB):
         def metadata_dump(sql, *multiparams, **params):
             print(sql.compile(dialect=engine.dialect))
         engine = create_engine(self.db_url, strategy='mock', executor=metadata_dump)
-        ColocalizationDAO.getMetaData().create_all(engine)
+        ColocalizationMapping.getMetadata().create_all(engine)
 
     def delete_all(self):
-        self.engine.execute(colocalization_table.delete())
-        ColocalizationDAO.getMetaData().drop_all(self.engine)
+        for table in ColocalizationMapping.getTables():
+            self.engine.execute(table.delete())
+        ColocalizationMapping.getMetadata().drop_all(self.engine)
 
 
     def load_data(self, path: str, header : bool=True) -> typing.Optional[int]:
@@ -132,13 +127,9 @@ class ColocalizationDAO(ColocalizationDB):
                     locus: Locus,
                     flags: typing.Dict[str, typing.Any]={},
                     projection = [Colocalization]):
-        locus_id1 = Colocalization.variants.any(and_(CausalVariant.variant1_chromosome == locus.chromosome,
-                                                      CausalVariant.variant1_position >= locus.start,
-                                                     CausalVariant.variant1_position <= locus.stop))
-
-        locus_id2 = Colocalization.variants.any(and_(CausalVariant.variant2_chromosome == locus.chromosome,
-                                                     CausalVariant.variant2_position >= locus.start,
-                                                     CausalVariant.variant2_position <= locus.stop))
+        locus_id = Colocalization.variants.any(and_(CausalVariant.variant_chromosome == locus.chromosome,
+                                                    CausalVariant.variant_position >= locus.start,
+                                                    CausalVariant.variant_position <= locus.stop))
 
         colocalization_filter = and_(Colocalization.phenotype1 == phenotype,
                                      Colocalization.chromosome == locus.chromosome)
@@ -147,7 +138,7 @@ class ColocalizationDAO(ColocalizationDB):
         return [session, session
                          .query(*projection)
                          .select_from(Colocalization)
-                         .filter(or_(locus_id1, locus_id2))
+                         .filter(or_(locus_id))
                          .filter(colocalization_filter) ]
 
     def get_locus(self,
@@ -189,16 +180,14 @@ class ColocalizationDAO(ColocalizationDB):
         rows = {}
         for r in query.all():
             variants = map(lambda r : r.json_rep(), r.variants)
-            variants = map(lambda v: [v["position1"],
-                                      v["position2"],
-                                      v["variant1"],
-                                      v["variant2"],
+            variants = map(lambda v: [v["position"],
+                                      v["variant"],
                                       v["pip1"],
                                       v["pip2"],
                                       v["beta1"],
                                       v["beta2"],
                                       v["id"],
-                                      v["count_variants"],
+                                      v["count_cs"],
                                       r.phenotype1,
                                       r.phenotype1_description,
                                       r.phenotype2,
@@ -206,46 +195,40 @@ class ColocalizationDAO(ColocalizationDB):
                                     ], variants)
             variants = list(map(list,zip(*variants)))
             if variants:
-                position1 = variants[0]
-                position2 = variants[1]
-                variant1 = variants[2]
-                variant2 = variants[3]
-                pip1 = variants[4]
-                pip2 = variants[5]
-                beta1 = variants[6]
-                beta2 = variants[7]
-                causalvariantid = variants[8]
-                count_variants = variants[9]
-                phenotype1 = variants[10]
-                phenotype1_description = variants[11]
-                phenotype2 = variants[12]
-                phenotype2_description = variants[13]
+                position = variants[0]
+                variant = variants[1]
+                pip1 = variants[2]
+                pip2 = variants[3]
+                beta1 = variants[4]
+                beta2 = variants[5]
+                causalvariantid = variants[6]
+                count_cs = variants[7]
+                phenotype1 = variants[8]
+                phenotype1_description = variants[9]
+                phenotype2 = variants[10]
+                phenotype2_description = variants[11]
             else:
-                position1 = []
-                position2 = []
-                variant1 = []
-                variant2 = []
+                position = []
+                variant = []
                 pip1 = []
                 pip2 = []
                 beta1 = []
                 beta2 = []
                 causalvariantid = []
-                count_variants = []
+                count_cs = []
                 phenotype1 = []
                 phenotype1_description = []
                 phenotype2 = []
                 phenotype2_description = []
                 
-            rows[r.id] = CausalVariantVector(position1,
-                                             position2,
-                                             variant1,
-                                             variant2,
+            rows[r.id] = CausalVariantVector(position,
+                                             variant,
                                              pip1,
                                              pip2,
                                              beta1,
                                              beta2,
                                              causalvariantid,
-                                             count_variants,
+                                             count_cs,
                                              phenotype1,
                                              phenotype1_description,
                                              phenotype2,

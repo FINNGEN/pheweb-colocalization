@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 .envrc
 *~
+finngen_common_data_model

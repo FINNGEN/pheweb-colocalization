@@ -13,17 +13,11 @@ import re
 class CausalVariantVector(JSONifiable, Kwargs):
     """ Vector of causal variants
     """
-    position1 = attr.ib(validator=attr.validators.deep_iterable(member_validator=attr.validators.optional(instance_of(int)),
-                                                                iterable_validator=instance_of(typing.List)))
-
-    position2 = attr.ib(validator=attr.validators.deep_iterable(member_validator=attr.validators.optional(instance_of(int)),
-                                                                iterable_validator=instance_of(typing.List)))
-
-    variant1 = attr.ib(validator=attr.validators.deep_iterable(member_validator=attr.validators.optional(instance_of(str)),
+    position = attr.ib(validator=attr.validators.deep_iterable(member_validator=attr.validators.optional(instance_of(int)),
                                                                iterable_validator=instance_of(typing.List)))
 
-    variant2 = attr.ib(validator=attr.validators.deep_iterable(member_validator=attr.validators.optional(instance_of(str)),
-                                                               iterable_validator=instance_of(typing.List)))
+    variant = attr.ib(validator=attr.validators.deep_iterable(member_validator=attr.validators.optional(instance_of(str)),
+                                                              iterable_validator=instance_of(typing.List)))
 
     pip1 = attr.ib(validator=attr.validators.deep_iterable(member_validator=attr.validators.optional(instance_of(float)),
                                                            iterable_validator=instance_of(typing.List)))
@@ -40,8 +34,8 @@ class CausalVariantVector(JSONifiable, Kwargs):
     causalvariantid = attr.ib(validator=attr.validators.deep_iterable(member_validator=instance_of(int),
                                                                       iterable_validator=instance_of(typing.List)))
 
-    count_variants = attr.ib(validator=attr.validators.deep_iterable(member_validator=instance_of(int),
-                                                              iterable_validator=instance_of(typing.List)))
+    count_cs = attr.ib(validator=attr.validators.deep_iterable(member_validator=instance_of(int),
+                                                               iterable_validator=instance_of(typing.List)))
 
     phenotype1 = attr.ib(validator=attr.validators.deep_iterable(member_validator=attr.validators.optional(instance_of(str)),
                                                                  iterable_validator=instance_of(typing.List)))
