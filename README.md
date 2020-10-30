@@ -5,28 +5,39 @@ pheweb colocalization
 
 Setup virtualenv
 
+```
    python3 -m venv env
    source env/bin/activate
+```
 
 Install packages
 
+```
    pip install .
-
+```
 
 Setup environment
 
+
+```
    export FLASK_APP=`pwd`/pheweb_colocalization/app.py
    export PYTHON_PATH=`pwd`
+```
+
 
 Setup your development database
 
 Load your database
 
+```
      export SQLALCHEMY_DATABASE_URI=sqlite:////tmp/tmp.db
      flask colocalization init ${SQLALCHEMY_DATABASE_URI}
      flask colocalization load ${SQLALCHEMY_DATABASE_URI} <datafile>
+```
 
 The endpoints
+
+```
      # Get the list of phenotypes
      curl http://127.0.0.1:5000/api/colocalization
      # examples
@@ -41,5 +52,8 @@ The endpoints
      curl http://127.0.0.1:5000/api/colocalization/$PHENOTYPE/$LOCUS/finemapping
      # get specific colocolization record 
      curl http://127.0.0.1:5000/api/colocalization/$COLOCALIZATION_ID
+```
 
 # Development
+	
+	
