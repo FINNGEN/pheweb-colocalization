@@ -55,12 +55,12 @@ class ColocalizationMapping():
     def getIndices():
         if not ColocalizationMapping.metadata:
             ColocalizationMapping.initialize()
-            return [ ColocalizationMapping.colocalization_chromosome ,
-                     ColocalizationMapping.colocalization_start,
-                     ColocalizationMapping.colocalization_stop,
-                     ColocalizationMapping.colocalization_phenotype1,
-                     ColocalizationMapping.colocalization_phenotype2,
-                     ColocalizationMapping.causal_variant_chromosome_position,
+        return [ ColocalizationMapping.colocalization_chromosome ,
+                 ColocalizationMapping.colocalization_start,
+                 ColocalizationMapping.colocalization_stop,
+                 ColocalizationMapping.colocalization_phenotype1,
+                 ColocalizationMapping.colocalization_phenotype2,
+                 ColocalizationMapping.causal_variant_chromosome_position,
             ]
         
     @staticmethod

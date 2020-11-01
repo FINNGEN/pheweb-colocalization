@@ -75,6 +75,9 @@ class ColocalizationDAO(ColocalizationDB):
 
 
     def load_data(self, path: str, header : bool=True) -> typing.Optional[int]:
+        for index in ColocalizationMapping.getIndices():
+            index.drop()
+        
         count = 0
         def generate_colocalization():
             with gzip.open(path, "rt") if path.endswith("gz") else open(path, 'r') as csv_file:
@@ -106,6 +109,8 @@ class ColocalizationDAO(ColocalizationDB):
             c = None
 
         session.commit()
+        for index in ColocalizationMapping.getIndices():
+            index.create()
         return count
 
     def save(self,colocalization : Colocalization) -> None:
