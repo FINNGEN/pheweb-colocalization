@@ -3,7 +3,11 @@ import click
 import os
 import typing
 import csv
+import time
+import attr
+import functools
 
+from attr.validators import instance_of
 from pheweb_colocalization.model_db import ColocalizationDAO
 from flask.cli import AppGroup, with_appcontext
 
@@ -12,34 +16,50 @@ from flask.cli import AppGroup, with_appcontext
 
 data_cli = AppGroup('colocalization', short_help="Colocalization commands")
 
-def wrap(path,f):
-    dao = ColocalizationDAO(db_url=path, parameters={})
-    try:
-        f(dao)
-    finally:
-        del dao
-    
+@attr.s        
+class DAOContext(object):
+    db_url = attr.ib(validator=instance_of(str))
+    parameters = attr.ib(default={})
+    timer = attr.ib(default=True)
+    echo = attr.ib(default=True)
+    def __enter__(self):
+        self.start_timer = time.perf_counter()
+
+        self.dao = ColocalizationDAO(db_url = self.db_url,
+                                     parameters = self.parameters,
+                                     echo = self.echo)
+        return self.dao
+  
+    def __exit__(self, *exc):
+        if(self.timer):
+            end_timer = time.perf_counter()
+            delta = round((end_timer - self.start_timer) * 1000000)
+            print("context took {0} ms ".format(delta))
+        del self.dao
+
 
 @data_cli.command("init")
 @click.argument("path", required=True, type=str)
 @with_appcontext
 def init(path) -> None:
-    wrap(path,lambda dao: dao.create_schema())
-
+    with DAOContext(path) as dao:
+        dao.create_schema()
 
 @data_cli.command("schema")
 @click.argument("path", required=True, type=str)
 @with_appcontext
 def dump(path) -> None:
-    wrap(path,lambda dao: dao.dump())
+    with DAOContext(path, timer = False) as dao:
+        dao.dump()
 
-    
-@data_cli.command("delete")
+@data_cli.command("delete", short_help="delete data and drop table")
 @click.argument("path", required=True, type=str)
 @with_appcontext
 def init(path) -> None:
-    wrap(path,lambda dao: dao.delete_all())
-
+    with DAOContext(path) as dao:
+        dao.delete_all()
+        
+    
 @data_cli.command("debug")
 @with_appcontext
 def harness() -> None:
@@ -52,4 +72,5 @@ def harness() -> None:
 @click.option('--header/--no-header', default=True)
 @with_appcontext
 def cli_load(path: str, data: str, header: bool) -> None:
-    wrap(path,lambda dao: dao.load_data(data, header = header))
+    with DAOContext(path, echo=False) as dao:
+        dao.load_data(data, header = header)

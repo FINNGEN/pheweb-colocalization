@@ -41,12 +41,12 @@ class ColocalizationDAO(ColocalizationDB):
         else:
             return path
 
-    def __init__(self, db_url: str, parameters=dict()):
+    def __init__(self, db_url: str, echo=True, parameters=dict()):
         self.db_url=ColocalizationDAO.mysql_config(db_url)
         print("ColocalizationDAO : {}".format(self.db_url))
         self.engine = create_engine(self.db_url,
                                     pool_pre_ping=True,
-                                    echo=True,
+                                    echo=echo,
                                     *parameters)
 
         ColocalizationMapping.getMetadata().bind = self.engine

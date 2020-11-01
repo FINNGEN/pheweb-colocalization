@@ -50,7 +50,19 @@ class ColocalizationMapping():
             ColocalizationMapping.initialize()
         return [ ColocalizationMapping.causal_variant_table,
                  ColocalizationMapping.colocalization_table ]
-    
+
+    @staticmethod
+    def getIndices():
+        if not ColocalizationMapping.metadata:
+            ColocalizationMapping.initialize()
+            return [ ColocalizationMapping.colocalization_chromosome ,
+                     ColocalizationMapping.colocalization_start,
+                     ColocalizationMapping.colocalization_stop,
+                     ColocalizationMapping.colocalization_phenotype1,
+                     ColocalizationMapping.colocalization_phenotype2,
+                     ColocalizationMapping.causal_variant_chromosome_position,
+            ]
+        
     @staticmethod
     def initialize():
         metadata = MetaData()
@@ -63,20 +75,20 @@ class ColocalizationMapping():
 
         ColocalizationMapping.colocalization_table = colocalization_table
         
-        colocalization_chromosome = Index('colocalization_chromosome',
-                                          colocalization_table.c.chromosome)
+        ColocalizationMapping.colocalization_chromosome = Index('colocalization_chromosome',
+                                                                colocalization_table.c.chromosome)
 
-        colocalization_start = Index('colocalization_start',
-                                     colocalization_table.c.start)
+        ColocalizationMapping.colocalization_start = Index('colocalization_start',
+                                                           colocalization_table.c.start)
 
-        colocalization_stop = Index('colocalization_stop',
-                                    colocalization_table.c.stop)
+        ColocalizationMapping.colocalization_stop = Index('colocalization_stop',
+                                                          colocalization_table.c.stop)
 
-        colocalization_phenotype1 = Index('colocalization_phenotype1',
-                                          colocalization_table.c.phenotype1)
+        ColocalizationMapping.colocalization_phenotype1 = Index('colocalization_phenotype1',
+                                                                colocalization_table.c.phenotype1)
         
-        colocalization_phenotype2 = Index('colocalization_phenotype2',
-                                          colocalization_table.c.phenotype2)
+        ColocalizationMapping.colocalization_phenotype2 = Index('colocalization_phenotype2',
+                                                                colocalization_table.c.phenotype2)
 
         causal_variant_table = Table('causal_variant',
                                      metadata,
@@ -85,9 +97,9 @@ class ColocalizationMapping():
 
         ColocalizationMapping.causal_variant_table = causal_variant_table
         
-        causal_variant_chromosome_position = Index('causal_variant_chromosome_position',
-                                                    causal_variant_table.c.variant_chromosome,
-                                                    causal_variant_table.c.variant_position)
+        ColocalizationMapping.causal_variant_chromosome_position = Index('causal_variant_chromosome_position',
+                                                                         causal_variant_table.c.variant_chromosome,
+                                                                         causal_variant_table.c.variant_position)
 
         
         causal_variant_mapper = mapper(CausalVariant,
