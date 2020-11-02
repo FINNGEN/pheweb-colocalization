@@ -83,12 +83,15 @@ class ColocalizationDAO(ColocalizationDB):
     
     def load_data(self, path: str, header : bool=True) -> typing.Tuple[typing.Optional[int],typing.Optional[int]]:
         count = 0
-
+        session = self.Session()
+        colocalization_count = 1 + (session.query(func.max(Colocalization.id)).scalar() or 0)
+        causal_variant_count = 1 + (session.query(func.max(CausalVariant.id)).scalar() or 0)
+        session.close()
+        session = self.Session()        
         for index in ColocalizationMapping.getIndices():
+            print(index)
             index.drop()
         try:
-            colocalization_count = 0
-            causal_variant_count = 0
             def generate_colocalization(colocalization_count, causal_variant_count):
                 with gzip.open(path, "rt") if path.endswith("gz") else open(path, 'r') as csv_file:
                     reader = csv.reader(csv_file, delimiter='\t', )
@@ -117,7 +120,7 @@ class ColocalizationDAO(ColocalizationDB):
                             print(line, file=sys.stderr, flush=True)
                             raise
 
-            session = self.Session()
+
             for dtos in chunks(generate_colocalization(colocalization_count, causal_variant_count),100):
                 dtos = list(dtos)
                 print('.', flush=True, end='')
@@ -126,6 +129,7 @@ class ColocalizationDAO(ColocalizationDB):
                 session.flush()
             session.commit()
         finally:
+            print()
             for index in ColocalizationMapping.getIndices():
                 index.create()
         return count
