@@ -38,21 +38,21 @@ class DAOContext(object):
         del self.dao
 
 
-@data_cli.command("init")
+@data_cli.command("init", short_help="create schema")
 @click.argument("path", required=True, type=str)
 @with_appcontext
 def init(path) -> None:
     with DAOContext(path) as dao:
         dao.create_schema()
 
-@data_cli.command("schema")
+@data_cli.command("schema", short_help="output schema")
 @click.argument("path", required=True, type=str)
 @with_appcontext
 def dump(path) -> None:
     with DAOContext(path, timer = False) as dao:
         dao.dump()
 
-@data_cli.command("delete", short_help="delete data and drop table")
+@data_cli.command("delete", short_help="delete data and drop tables")
 @click.argument("path", required=True, type=str)
 @with_appcontext
 def init(path) -> None:
@@ -60,13 +60,16 @@ def init(path) -> None:
         dao.delete_all()
         
     
-@data_cli.command("debug")
+@data_cli.command("debug", short_help="start a debug session")
 @with_appcontext
 def harness() -> None:
+    from finngen_common_data_model.colocalization import Colocalization
+    print(Colocalization.columns())
+
     import pdb; pdb.set_trace()
 
 
-@data_cli.command("load")
+@data_cli.command("load", short_help="load data file")
 @click.argument("path", required=True, type=str)
 @click.argument("data", required=True, type=str)
 @click.option('--header/--no-header', default=True)

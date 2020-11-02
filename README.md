@@ -30,10 +30,19 @@ Setup your development database
 Load your database
 
 ```
-     export SQLALCHEMY_DATABASE_URI=sqlite:////tmp/tmp.db
-     flask colocalization init ${SQLALCHEMY_DATABASE_URI}
-     flask colocalization load ${SQLALCHEMY_DATABASE_URI} <datafile>
+     export SQLALCHEMY_DATABASE_URI=sqlite:////tmp/tmp.db # setup environment
+     flask colocalization init ${SQLALCHEMY_DATABASE_URI} # initialize database
+     flask colocalization load ${SQLALCHEMY_DATABASE_URI} <datafile> # load file into database
 ```
+
+Additional commands
+
+```
+     flask colocalization delete ${SQLALCHEMY_DATABASE_URI} # delete schema
+	 flask colocalization schema ${SQLALCHEMY_DATABASE_URI} # output schema
+	 flask colocalization --help # command help
+```
+
 
 The endpoints
 
