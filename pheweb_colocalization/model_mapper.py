@@ -7,10 +7,6 @@ from finngen_common_data_model.colocalization import CausalVariant, Colocalizati
 
 from pheweb_colocalization.model import CausalVariantVector, SearchSummary, SearchResults, PhenotypeList, ColocalizationDB
 
-def refine_colocalization(c : Colocalization) -> Colocalization:
-    c = {x: getattr(c, x) for x in Colocalization.column_names()}
-    return Colocalization(**c)
-
 def NullableVariant(chromosome : typing.Optional[str],
                     position : typing.Optional[int],
                     reference : typing.Optional[str],

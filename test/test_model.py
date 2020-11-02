@@ -5,16 +5,14 @@ from pheweb_colocalization.model import CausalVariantVector, SearchSummary, Sear
 
 
 def test_causal_variant_vector():
-    causalVariantVector = CausalVariantVector(position1 = [],
-                                              position2 = [],
-                                              variant1 = [],
-                                              variant2 = [],
+    causalVariantVector = CausalVariantVector(position = [],
+                                              variant = [],
                                               pip1 = [],
                                               pip2 = [],
                                               beta1 = [],
                                               beta2 = [],
                                               causalvariantid = [],
-                                              count_variants = [],
+                                              count_cs = [],
                                               phenotype1 = [],
                                               phenotype1_description = [],
                                               phenotype2 = [],
@@ -22,17 +20,15 @@ def test_causal_variant_vector():
     expected =  {'beta1': [],
                  'beta2': [],
                  'causalvariantid': [],
-                 'count_variants': [],
+                 'count_cs': [],
                  'phenotype1': [],
                  'phenotype1_description': [],
                  'phenotype2': [],
                  'phenotype2_description': [],
                  'pip1': [],
                  'pip2': [],
-                 'position1': [],
-                 'position2': [],
-                 'variant1': [],
-                 'variant2': [] }
+                 'position': [],
+                 'variant': [] }
     actual = causalVariantVector.json_rep()
     assert expected == actual
     

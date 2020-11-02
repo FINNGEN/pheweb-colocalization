@@ -29,6 +29,10 @@ def chunks(iterable, size=10):
 # TODO remove
 csv.field_size_limit(sys.maxsize)
 
+def refine_colocalization(c : Colocalization) -> Colocalization:
+    c = {x: getattr(c, x) for x in Colocalization.db_column_names()}
+    return Colocalization(**c)
+
 class ColocalizationDAO(ColocalizationDB):
 
     @staticmethod
