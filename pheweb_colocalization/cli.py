@@ -76,4 +76,4 @@ def harness() -> None:
 @with_appcontext
 def cli_load(path: str, data: str, header: bool) -> None:
     with DAOContext(path, echo=False) as dao:
-        dao.load_data(data, header = header)
+        print("loaded {0} entries ".format(dao.load_data(data, header = header)))

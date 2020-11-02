@@ -19,6 +19,13 @@ import importlib.machinery
 import importlib.util
 from sqlalchemy.sql import func
 
+# see : https://stackoverflow.com/questions/24527006/split-a-generator-into-chunks-without-pre-walking-it
+import itertools
+def chunks(iterable, size=10):
+    iterator = iter(iterable)
+    for first in iterator:
+        yield itertools.chain([first], itertools.islice(iterator, size - 1))
+
 # TODO remove
 csv.field_size_limit(sys.maxsize)
 
@@ -73,44 +80,54 @@ class ColocalizationDAO(ColocalizationDB):
             self.engine.execute(table.delete())
         ColocalizationMapping.getMetadata().drop_all(self.engine)
 
+    
+    def load_data(self, path: str, header : bool=True) -> typing.Tuple[typing.Optional[int],typing.Optional[int]]:
+        count = 0
 
-    def load_data(self, path: str, header : bool=True) -> typing.Optional[int]:
         for index in ColocalizationMapping.getIndices():
             index.drop()
-        
-        count = 0
-        def generate_colocalization():
-            with gzip.open(path, "rt") if path.endswith("gz") else open(path, 'r') as csv_file:
-                reader = csv.reader(csv_file, delimiter='\t', )
+        try:
+            colocalization_count = 0
+            causal_variant_count = 0
+            def generate_colocalization(colocalization_count, causal_variant_count):
+                with gzip.open(path, "rt") if path.endswith("gz") else open(path, 'r') as csv_file:
+                    reader = csv.reader(csv_file, delimiter='\t', )
+                    
+                    if header:
+                        actual_header = next(reader)
+                        assert Colocalization.cvs_column_names() == actual_header, \
+                            "header expected '{expected_header}' got '{actual_header}'".format(expected_header=expected_header,
+                                                                                               actual_header=actual_header)
 
-                if header:
-                    actual_header = next(reader)
-                    assert Colocalization.cvs_column_names() == actual_header, \
-                        "header expected '{expected_header}' got '{actual_header}'".format(expected_header=expected_header,
-                                                                                           actual_header=actual_header)
+                    for line in reader:
+                        try:
+                            dto = Colocalization.from_list(line)
+                            dto.id = colocalization_count
+                            colocalization_count = colocalization_count + 1
+                            for v in dto.variants:
+                                v.id = causal_variant_count
+                                causal_variant_count = causal_variant_count + 1
 
-                for line in reader:
-                    #count = count + 1
-                    try:
-                        dto = Colocalization.from_list(line)
-                        yield dto
-                    except Exception as e:
-                        print(line)
-                        print(e)
-                        print("file:{}".format(path), file=sys.stderr, flush=True)
-                        print("line:{}".format(count), file=sys.stderr, flush=True)
-                        print(line, file=sys.stderr, flush=True)
-                        raise
+                            yield dto
+                        except Exception as e:
+                            print(line)
+                            print(e)
+                            print("file:{}".format(path), file=sys.stderr, flush=True)
+                            #print("line:{}".format(count), file=sys.stderr, flush=True)
+                            print(line, file=sys.stderr, flush=True)
+                            raise
 
-        session = self.Session()
-        for c in generate_colocalization():
-            print('.', flush=True, end='')
-            self.save(c)
-            c = None
-
-        session.commit()
-        for index in ColocalizationMapping.getIndices():
-            index.create()
+            session = self.Session()
+            for dtos in chunks(generate_colocalization(colocalization_count, causal_variant_count),100):
+                dtos = list(dtos)
+                print('.', flush=True, end='')
+                session.add_all(dtos)
+                count += len(dtos)
+                session.flush()
+            session.commit()
+        finally:
+            for index in ColocalizationMapping.getIndices():
+                index.create()
         return count
 
     def save(self,colocalization : Colocalization) -> None:
