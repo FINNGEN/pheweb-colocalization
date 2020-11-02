@@ -49,23 +49,25 @@ class ColocalizationDAO(ColocalizationDB):
             return path
 
     def __init__(self, db_url: str, echo=True, parameters=dict()):
+
         self.db_url=ColocalizationDAO.mysql_config(db_url)
         print("ColocalizationDAO : {}".format(self.db_url))
         self.engine = create_engine(self.db_url,
                                     pool_pre_ping=True,
                                     echo=echo,
                                     *parameters)
-
-        ColocalizationMapping.getMetadata().bind = self.engine
+        self.mapping = ColocalizationMapping.getInstance()
+        self.mapping.getMetadata().bind = self.engine
         self.Session = sessionmaker(bind=self.engine)
         self.support = DAOSupport(Colocalization)
+
 
     def __del__(self):
         if hasattr(self, 'engine') and self.engine:
             self.engine.dispose()
 
     def create_schema(self):
-        return ColocalizationMapping.getMetadata().create_all(self.engine)
+        return self.mapping.getMetadata().create_all(self.engine)
 
     def dump(self):
         print(self.db_url)
@@ -73,12 +75,12 @@ class ColocalizationDAO(ColocalizationDB):
         def metadata_dump(sql, *multiparams, **params):
             print(sql.compile(dialect=engine.dialect))
         engine = create_engine(self.db_url, strategy='mock', executor=metadata_dump)
-        ColocalizationMapping.getMetadata().create_all(engine)
+        self.mapping.getMetadata().create_all(engine)
 
     def delete_all(self):
-        for table in ColocalizationMapping.getTables():
+        for table in self.mapping.getTables():
             self.engine.execute(table.delete())
-        ColocalizationMapping.getMetadata().drop_all(self.engine)
+        self.mapping.getMetadata().drop_all(self.engine)
 
     
     def load_data(self, path: str, header : bool=True) -> typing.Tuple[typing.Optional[int],typing.Optional[int]]:
@@ -88,7 +90,7 @@ class ColocalizationDAO(ColocalizationDB):
         causal_variant_count = 1 + (session.query(func.max(CausalVariant.id)).scalar() or 0)
         session.close()
         session = self.Session()        
-        for index in ColocalizationMapping.getIndices():
+        for index in self.mapping.getIndices():
             print(index)
             index.drop()
         try:
@@ -130,7 +132,7 @@ class ColocalizationDAO(ColocalizationDB):
             session.commit()
         finally:
             print()
-            for index in ColocalizationMapping.getIndices():
+            for index in self.mapping.getIndices():
                 index.create()
         return count
 
