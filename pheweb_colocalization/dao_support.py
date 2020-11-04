@@ -95,7 +95,6 @@ class DAOSupport:
             query = query.limit(limit)
         if offset is not None:
             query = query.offset(limit)
-        print(query)
         return warnings, query
 
     def create_aggregates(self, fields: typing.List[str]):
@@ -150,6 +149,5 @@ class DAOSupport:
         
         warnings, query = self.create_filter(session.query(self.clazz), flags)
         print(warnings)
-        print(query)
         return [f(r) for r in query.all()]
 

@@ -19,19 +19,17 @@ import importlib.machinery
 import importlib.util
 from sqlalchemy.sql import func
 
-# see : https://stackoverflow.com/questions/24527006/split-a-generator-into-chunks-without-pre-walking-it
-import itertools
-def chunks(iterable, size=10):
-    iterator = iter(iterable)
-    for first in iterator:
-        yield itertools.chain([first], itertools.islice(iterator, size - 1))
-
+def chunk(iterable, size):
+    buffer = []
+    for v in iterable():
+        buffer.append(v)
+        if(len(buffer) >= size):
+            yield buffer
+            buffer = []
+    if buffer:
+        yield buffer
 # TODO remove
 csv.field_size_limit(sys.maxsize)
-
-def refine_colocalization(c : Colocalization) -> Colocalization:
-    c = {x: getattr(c, x) for x in Colocalization.db_column_names()}
-    return Colocalization(**c)
 
 class ColocalizationDAO(ColocalizationDB):
 
@@ -52,7 +50,7 @@ class ColocalizationDAO(ColocalizationDB):
         else:
             return path
 
-    def __init__(self, db_url: str, echo=True, parameters=dict()):
+    def __init__(self, db_url: str, echo=False, parameters=dict()):
 
         self.db_url=ColocalizationDAO.mysql_config(db_url)
         print("ColocalizationDAO : {}".format(self.db_url))
@@ -95,8 +93,7 @@ class ColocalizationDAO(ColocalizationDB):
         session.close()
         session = self.Session()        
         for index in self.mapping.getIndices():
-            print(index)
-            index.drop()
+             index.drop()
         try:
             def generate_colocalization(colocalization_count, causal_variant_count):
                 with gzip.open(path, "rt") if path.endswith("gz") else open(path, 'r') as csv_file:
@@ -122,17 +119,16 @@ class ColocalizationDAO(ColocalizationDB):
                             print(line)
                             print(e)
                             print("file:{}".format(path), file=sys.stderr, flush=True)
-                            #print("line:{}".format(count), file=sys.stderr, flush=True)
                             print(line, file=sys.stderr, flush=True)
                             raise
 
-
-            for dtos in chunks(generate_colocalization(colocalization_count, causal_variant_count),100):
+            for dtos in chunk(lambda : generate_colocalization(colocalization_count, causal_variant_count),100):
                 dtos = list(dtos)
                 print('.', flush=True, end='')
                 session.add_all(dtos)
                 count += len(dtos)
                 session.flush()
+                del dtos
             session.commit()
         finally:
             print()
@@ -189,7 +185,7 @@ class ColocalizationDAO(ColocalizationDB):
         """
         [session,query] = self.locus_query(phenotype, locus, flags)
         matches = query.all()
-        session.expire_all()
+        matches = list(map(lambda c : Colocalization(**c.kwargs_rep()),matches))
         return SearchResults(colocalizations=matches,
                              count=len(matches))
 
@@ -298,6 +294,7 @@ class ColocalizationDAO(ColocalizationDB):
                                                        "locus_id1_alternate": variant.alternate,
                                              },**flags},
                                              f=refine_colocalization)
+        session.expire_all()
         return SearchResults(colocalizations=matches,
                              count=len(matches))
         

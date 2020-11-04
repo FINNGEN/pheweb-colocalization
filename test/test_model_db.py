@@ -1,9 +1,21 @@
 from finngen_common_data_model.genomics import Locus, Variant
 from finngen_common_data_model.colocalization import Colocalization, CausalVariant
-from pheweb_colocalization.model_db import ColocalizationDAO
+from pheweb_colocalization.model_db import ColocalizationDAO, chunk
 
-print(Variant)
-print(CausalVariant)
+def count(n):
+    for x in range(n):
+        yield x
+        
+def test_chunk_1():
+    actual = list(chunk(lambda : count(10),2))
+    expected = [[0, 1],[2, 3],[4, 5],[6, 7],[8, 9]]
+    assert actual == expected
+
+def test_chunk_2():
+    actual = list(chunk(lambda : count(11),2))
+    expected = [[0, 1],[2, 3],[4, 5],[6, 7],[8, 9],[10]]
+    assert actual == expected
+
 def test_can_insert():
     dao = ColocalizationDAO('sqlite:///:memory:')
     dao.create_schema()

@@ -116,6 +116,6 @@ class ColocalizationMapping():
                                                                           colocalization_table.c.start,
                                                                           colocalization_table.c.stop),
 
-                                                       'variants': relationship(CausalVariant),
+                                                       'variants': relationship(CausalVariant, lazy="joined"),
                                        })
         
