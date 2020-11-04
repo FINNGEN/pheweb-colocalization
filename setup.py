@@ -12,12 +12,12 @@ setup(name='pheweb_colocalization',
       tests_require=['pytest', 'tox', 'pytest-cov', ],
       install_requires=[
           'Flask>=0.12',
-          'finngen_common_data_model@git+https://github.com/FINNGEN/finngen-common-data-model.git@06ad44de886a220a5c7cb6b1287aacbc4e7dd0cb#egg=finngen_common_data_model',
+          'finngen_common_data_model@git+https://github.com/FINNGEN/finngen-common-data-model.git@ea9f420d1e7231cf54a035e35326890f6f640e00#egg=finngen_common_data_model',
           'attrs>=19.3.0',
           'SQLAlchemy>=1.3.18',
           'PyMySQL>=0.10.1',
           'pytest>=5.4.3',
           'mysqlclient>=2.0.1',
       ],
-      dependency_links=['https://github.com/FINNGEN/finngen-common-data-model.git@06ad44de886a220a5c7cb6b1287aacbc4e7dd0cb#egg=finngen_common_data_model']
+      dependency_links=['https://github.com/FINNGEN/finngen-common-data-model.git@ea9f420d1e7231cf54a035e35326890f6f640e00#egg=finngen_common_data_model']
 )
