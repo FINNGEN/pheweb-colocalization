@@ -19,5 +19,8 @@ setup(name='pheweb_colocalization',
           'pytest>=5.4.3',
           'mysqlclient>=2.0.1',
       ],
-      dependency_links=['https://github.com/FINNGEN/finngen-common-data-model.git@ea9f420d1e7231cf54a035e35326890f6f640e00#egg=finngen_common_data_model']
+      dependency_links=['https://github.com/FINNGEN/finngen-common-data-model.git@ea9f420d1e7231cf54a035e35326890f6f640e00#egg=finngen_common_data_model'],
+      extras_require={
+          'dev': ['pytest>=6.1.2', 'pytest-cov>=2.10.1', ],
+      }
 )

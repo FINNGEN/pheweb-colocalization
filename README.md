@@ -66,3 +66,8 @@ The endpoints
 # Development
 	
 	
+Install packages
+
+```
+   pip install . [dev]
+```

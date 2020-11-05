@@ -17,7 +17,7 @@ def test_chunk_2():
     assert actual == expected
 
 def test_can_insert():
-    dao = ColocalizationDAO('sqlite:///:memory:')
+    dao = ColocalizationDAO('sqlite:///:memory:', echo = True)
     dao.create_schema()
     phenotype1 = "phenotype1"
     casual_variant1 = CausalVariant(id = 1,

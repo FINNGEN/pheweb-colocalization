@@ -19,6 +19,10 @@ import importlib.machinery
 import importlib.util
 from sqlalchemy.sql import func
 
+def refine_colocalization(c : Colocalization):
+    return Colocalization(**c.kwargs_rep())
+
+
 def chunk(iterable, size):
     buffer = []
     for v in iterable():
@@ -169,6 +173,7 @@ class ColocalizationDAO(ColocalizationDB):
                          .filter(or_(locus_id))
                          .filter(colocalization_filter) ]
 
+    
     def get_locus(self,
                   phenotype: str,
                   locus: Locus,
@@ -185,7 +190,7 @@ class ColocalizationDAO(ColocalizationDB):
         """
         [session,query] = self.locus_query(phenotype, locus, flags)
         matches = query.all()
-        matches = list(map(lambda c : Colocalization(**c.kwargs_rep()),matches))
+        matches = [ refine_colocalization(x) for x in matches]
         return SearchResults(colocalizations=matches,
                              count=len(matches))
 
