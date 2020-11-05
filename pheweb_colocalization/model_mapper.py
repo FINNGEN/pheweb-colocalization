@@ -44,12 +44,14 @@ class ColocalizationMapping():
                  self.colocalization_table ]
 
     def getIndices(self):
-        return [ self.colocalization_chromosome ,
+        return [ self.colocalization_chromosome,
                  self.colocalization_start,
                  self.colocalization_stop,
                  self.colocalization_phenotype1,
                  self.colocalization_phenotype2,
-                 self.causal_variant_chromosome_position ]
+                 self.colocalization_phenotype1_chromosome,
+                 self.causal_variant_chromosome_position,
+                 self.causal_variant_position_chromosome_colocalization_id ]
         
     def initialize(self):
         metadata = MetaData()
@@ -77,6 +79,10 @@ class ColocalizationMapping():
         self.colocalization_phenotype2 = Index('colocalization_phenotype2',
                                                colocalization_table.c.phenotype2)
 
+        self.colocalization_phenotype1_chromosome = Index('colocalization_phenotype1_chromosome',
+                                                          colocalization_table.c.phenotype1,
+                                                          colocalization_table.c.chromosome)
+        
         causal_variant_table = Table('causal_variant',
                                      metadata,
                                      *CausalVariant.columns(),
@@ -84,10 +90,14 @@ class ColocalizationMapping():
 
         self.causal_variant_table = causal_variant_table
         
-        self.causal_variant_chromosome_position = Index('causal_variant_chromosome_position',
-                                                        causal_variant_table.c.variant_chromosome,
-                                                        causal_variant_table.c.variant_position)
+        self.causal_variant_chromosome_position = Index('causal_variant_position_chromosome',
+                                                        causal_variant_table.c.variant_position,
+                                                        causal_variant_table.c.variant_chromosome)
 
+        self.causal_variant_position_chromosome_colocalization_id = Index('causal_variant_position_chromosome_colocalization_id',
+                                                                          causal_variant_table.c.variant_position,
+                                                                          causal_variant_table.c.variant_chromosome,
+                                                                          causal_variant_table.c.colocalization_id)
         
         causal_variant_mapper = mapper(CausalVariant,
                                        causal_variant_table,

@@ -69,5 +69,5 @@ The endpoints
 Install packages
 
 ```
-   pip install . [dev]
+   pip install .[dev]
 ```
