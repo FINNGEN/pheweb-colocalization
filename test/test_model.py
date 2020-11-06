@@ -1,6 +1,5 @@
 from finngen_common_data_model.genomics import Locus, Variant
 from finngen_common_data_model.colocalization import Colocalization, CausalVariant
-from finngen_common_data_model.data import nvl, na, ascii
 from pheweb_colocalization.model import CausalVariantVector, SearchSummary, SearchResults, PhenotypeList
 
 

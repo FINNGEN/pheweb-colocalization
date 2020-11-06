@@ -13,4 +13,4 @@ def test_colocalization_mapping():
 def test_get_tables():
     instance = ColocalizationMapping.getInstance()
     assert len(instance.getTables()) == 2
-    assert len(instance.getIndices()) == 6
+    assert len(instance.getIndices()) == 8

@@ -86,7 +86,7 @@ class ColocalizationMapping():
         causal_variant_table = Table('causal_variant',
                                      metadata,
                                      *CausalVariant.columns(),
-                                     Column('colocalization_id', Integer, ForeignKey('colocalization.id')))
+                                     Column('colocalization_id', Integer, ForeignKey('colocalization.colocalization_id')))
 
         self.causal_variant_table = causal_variant_table
         
