@@ -92,14 +92,14 @@ class ColocalizationDAO(ColocalizationDB):
     def load_data(self, path: str, header : bool=True) -> typing.Tuple[typing.Optional[int],typing.Optional[int]]:
         count = 0
         session = self.Session()
-        colocalization_count = 1 + (session.query(func.max(Colocalization.id)).scalar() or 0)
-        causal_variant_count = 1 + (session.query(func.max(CausalVariant.id)).scalar() or 0)
+        colocalization_id = 1 + (session.query(func.max(Colocalization.colocalization_id)).scalar() or 0)
+        causal_variant_id = 1 + (session.query(func.max(CausalVariant.causal_variant_id)).scalar() or 0)
         session.close()
         session = self.Session()        
         for index in self.mapping.getIndices():
              index.drop()
         try:
-            def generate_colocalization(colocalization_count, causal_variant_count):
+            def generate_colocalization(colocalization_id, causal_variant_id):
                 with gzip.open(path, "rt") if path.endswith("gz") else open(path, 'r') as csv_file:
                     reader = csv.reader(csv_file, delimiter='\t', )
                     
@@ -112,11 +112,11 @@ class ColocalizationDAO(ColocalizationDB):
                     for line in reader:
                         try:
                             dto = Colocalization.from_list(line)
-                            dto.id = colocalization_count
-                            colocalization_count = colocalization_count + 1
+                            dto.colocalization_id = colocalization_id
+                            colocalization_id = colocalization_id + 1
                             for v in dto.variants:
-                                v.id = causal_variant_count
-                                causal_variant_count = causal_variant_count + 1
+                                v.causal_variant_id = causal_variant_id
+                                causal_variant_id = causal_variant_id + 1
 
                             yield dto
                         except Exception as e:
@@ -126,7 +126,7 @@ class ColocalizationDAO(ColocalizationDB):
                             print(line, file=sys.stderr, flush=True)
                             raise
 
-            for dtos in chunk(lambda : generate_colocalization(colocalization_count, causal_variant_count),100):
+            for dtos in chunk(lambda : generate_colocalization(colocalization_id, causal_variant_id),100):
                 dtos = list(dtos)
                 print('.', flush=True, end='')
                 session.add_all(dtos)
@@ -219,7 +219,7 @@ class ColocalizationDAO(ColocalizationDB):
                                       v["pip2"],
                                       v["beta1"],
                                       v["beta2"],
-                                      v["id"],
+                                      v["causal_variant_id"],
                                       v["count_cs"],
                                       r.phenotype1,
                                       r.phenotype1_description,
@@ -234,7 +234,7 @@ class ColocalizationDAO(ColocalizationDB):
                 pip2 = variants[3]
                 beta1 = variants[4]
                 beta2 = variants[5]
-                causalvariantid = variants[6]
+                causal_variant_id = variants[6]
                 count_cs = variants[7]
                 phenotype1 = variants[8]
                 phenotype1_description = variants[9]
@@ -247,25 +247,25 @@ class ColocalizationDAO(ColocalizationDB):
                 pip2 = []
                 beta1 = []
                 beta2 = []
-                causalvariantid = []
+                causal_variant_id = []
                 count_cs = []
                 phenotype1 = []
                 phenotype1_description = []
                 phenotype2 = []
                 phenotype2_description = []
                 
-            rows[r.id] = CausalVariantVector(position,
-                                             variant,
-                                             pip1,
-                                             pip2,
-                                             beta1,
-                                             beta2,
-                                             causalvariantid,
-                                             count_cs,
-                                             phenotype1,
-                                             phenotype1_description,
-                                             phenotype2,
-                                             phenotype2_description)
+            rows[r.colocalization_id] = CausalVariantVector(position,
+                                                            variant,
+                                                            pip1,
+                                                            pip2,
+                                                            beta1,
+                                                            beta2,
+                                                            causal_variant_id,
+                                                            count_cs,
+                                                            phenotype1,
+                                                            phenotype1_description,
+                                                            phenotype2,
+                                                            phenotype2_description)
 
 
 
