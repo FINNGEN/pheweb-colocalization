@@ -1,6 +1,9 @@
 from finngen_common_data_model.genomics import Locus, Variant
 from finngen_common_data_model.colocalization import Colocalization, CausalVariant
 from pheweb_colocalization.model_db import ColocalizationDAO, chunk
+import uuid
+
+rel = str(uuid.uuid4())
 
 def count(n):
     for x in range(n):
@@ -20,14 +23,18 @@ def test_can_insert():
     dao = ColocalizationDAO('sqlite:///:memory:', echo = True)
     dao.create_schema()
     phenotype1 = "phenotype1"
-    casual_variant1 = CausalVariant(causal_variant_id = 1,
+    
+    
+    casual_variant1 = CausalVariant(rel = rel,
+                                    causal_variant_id = 1,
                                     variant = Variant.from_str("chr1_2_A_C"),
                                     pip1 = 1.0,
                                     pip2 = 2.0,
                                     beta1 = 3.0,
                                     beta2 = 4.0)
     
-    casual_variant2 = CausalVariant(causal_variant_id = 2,
+    casual_variant2 = CausalVariant(rel = rel,
+                                    causal_variant_id = 2,
                                     variant = Variant.from_str("chr1_10_G_T"),
                                     pip1 = 5.0,
                                     pip2 = 6.0,
@@ -36,7 +43,8 @@ def test_can_insert():
     
     variants = [casual_variant1, casual_variant2]
     
-    colocalization = Colocalization(colocalization_id=1,
+    colocalization = Colocalization(rel = rel,
+                                    colocalization_id=1,
                                     source1 = "source1",
                                     source2 = "source2",
                                     phenotype1 = phenotype1,

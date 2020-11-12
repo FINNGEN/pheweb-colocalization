@@ -70,10 +70,11 @@ def harness() -> None:
 
 
 @data_cli.command("load", short_help="load data file")
+@click.argument("release", required=True, type=int)
 @click.argument("path", required=True, type=str)
 @click.argument("data", required=True, type=str)
 @click.option('--header/--no-header', default=True)
 @with_appcontext
-def cli_load(path: str, data: str, header: bool) -> None:
+def cli_load(release: int, path: str, data: str, header: bool) -> None:
     with DAOContext(path, echo=False) as dao:
-        print("loaded {0} entries from : '{1}' ".format(dao.load_data(data, header = header),path))
+        print("loaded {0} entries from : '{1}' ".format(dao.load_data(release, data, header = header),path))

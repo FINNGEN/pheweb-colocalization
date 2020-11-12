@@ -89,7 +89,7 @@ class ColocalizationDAO(ColocalizationDB):
         self.mapping.getMetadata().drop_all(self.engine)
 
     
-    def load_data(self, path: str, header : bool=True) -> typing.Tuple[typing.Optional[int],typing.Optional[int]]:
+    def load_data(self, release: int, path: str, header : bool=True) -> typing.Tuple[typing.Optional[int],typing.Optional[int]]:
         count = 0
         session = self.Session()
         colocalization_id = 1 + (session.query(func.max(Colocalization.colocalization_id)).scalar() or 0)
@@ -111,7 +111,7 @@ class ColocalizationDAO(ColocalizationDB):
 
                     for line in reader:
                         try:
-                            dto = Colocalization.from_list(line)
+                            dto = Colocalization.from_list(release,line)
                             dto.colocalization_id = colocalization_id
                             colocalization_id = colocalization_id + 1
                             for v in dto.variants:

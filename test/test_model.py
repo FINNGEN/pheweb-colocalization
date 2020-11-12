@@ -10,7 +10,7 @@ def test_causal_variant_vector():
                                               pip2 = [],
                                               beta1 = [],
                                               beta2 = [],
-                                              causalvariantid = [],
+                                              causal_variant_id = [],
                                               count_cs = [],
                                               phenotype1 = [],
                                               phenotype1_description = [],
@@ -18,7 +18,7 @@ def test_causal_variant_vector():
                                               phenotype2_description = [])
     expected =  {'beta1': [],
                  'beta2': [],
-                 'causalvariantid': [],
+                 'causal_variant_id': [],
                  'count_cs': [],
                  'phenotype1': [],
                  'phenotype1_description': [],
