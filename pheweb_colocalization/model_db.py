@@ -36,7 +36,13 @@ def chunk(iterable, size):
 csv.field_size_limit(sys.maxsize)
 
 class ColocalizationDAO(ColocalizationDB):
-
+    # Large credible sets result in
+    # long running queries and huge
+    # result sets ~90M.  Using this
+    # threshold the results sets are
+    # made smaller.
+    CREDIBLE_SET_LENGTH_THRESHOLD = 1000
+    
     @staticmethod
     def mysql_config(path : str) -> typing.Optional[str] :
         print(path)
@@ -162,9 +168,10 @@ class ColocalizationDAO(ColocalizationDB):
         locus_id = Colocalization.variants.any(and_(CausalVariant.variant_chromosome == locus.chromosome,
                                                     CausalVariant.variant_position >= locus.start,
                                                     CausalVariant.variant_position <= locus.stop))
-
+        
         colocalization_filter = and_(Colocalization.phenotype1 == phenotype,
-                                     Colocalization.chromosome == locus.chromosome)
+                                     Colocalization.chromosome == locus.chromosome,
+                                     Colocalization.len_cs2 < ColocalizationDAO.CREDIBLE_SET_LENGTH_THRESHOLD)
         phenotype1 = Colocalization.phenotype1 == phenotype
         session = self.Session()
         return [session, session
