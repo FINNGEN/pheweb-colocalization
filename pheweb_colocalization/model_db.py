@@ -111,7 +111,8 @@ class ColocalizationDAO(ColocalizationDB):
                     
                     if header:
                         actual_header = next(reader)
-                        assert Colocalization.cvs_column_names() == actual_header, \
+                        expected_header = Colocalization.cvs_column_names()
+                        assert expected_header == actual_header, \
                             "header expected '{expected_header}' got '{actual_header}'".format(expected_header=expected_header,
                                                                                                actual_header=actual_header)
 
