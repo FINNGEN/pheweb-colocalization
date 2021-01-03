@@ -2,8 +2,9 @@ from finngen_common_data_model.genomics import Locus, Variant
 from finngen_common_data_model.colocalization import Colocalization, CausalVariant
 from pheweb_colocalization.model_db import ColocalizationDAO, chunk
 import uuid
+import random
 
-rel = str(uuid.uuid4())
+rel = random.randint(1, 10)
 
 def count(n):
     for x in range(n):
