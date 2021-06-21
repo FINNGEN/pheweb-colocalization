@@ -29,7 +29,9 @@ Setup your development database
 
 Load your database
 
+```
 SQLALCHEMY_DATABASE_URI
+```
 
 The standard sqlalchemy [database url](https://docs.sqlalchemy.org/en/14/core/engines.html#database-urls) are supported.
 
