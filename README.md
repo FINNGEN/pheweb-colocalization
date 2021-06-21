@@ -25,15 +25,16 @@ Setup environment
 ```
 
 
-Setup your development database
+## Setting up your development database
 
-Load your database
 
-```
-SQLALCHEMY_DATABASE_URI
-```
 
 The standard sqlalchemy [database url](https://docs.sqlalchemy.org/en/14/core/engines.html#database-urls) are supported.
+Set your uri :
+
+```
+export SQLALCHEMY_DATABASE_URI=
+```
 
 
 In addition the path of a mysql configuration file can be specified and is often used :
