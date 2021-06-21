@@ -40,7 +40,7 @@ export SQLALCHEMY_DATABASE_URI=
 In addition the path of a mysql configuration file can be specified and is often used :
 
 ```
-	export SQLALCHEMY_DATABASE_URI=./mysql.conf
+	export SQLALCHEMY_DATABASE_URI=/tmp/mysql.conf
 ```
 
 Setting up a sqlite database is a convient to setup :
@@ -57,7 +57,7 @@ Create the database schema if it doesn't exist the database :
      flask colocalization init ${SQLALCHEMY_DATABASE_URI} # create schema
 ```
 
-Load a colocalization file into your database :
+Load a colocalization file into your database (has to start with a slash) :
 
 ```
      flask colocalization load ${SQLALCHEMY_DATABASE_URI} <datafile> # load data file into database
