@@ -25,22 +25,56 @@ Setup environment
 ```
 
 
-Setup your development database
+## Setting up your development database
 
-Load your database
+
+
+The standard sqlalchemy [database url](https://docs.sqlalchemy.org/en/14/core/engines.html#database-urls) are supported.
+Set your uri :
+
+```
+export SQLALCHEMY_DATABASE_URI=
+```
+
+
+In addition the path of a mysql configuration file can be specified and is often used :
+
+```
+	export SQLALCHEMY_DATABASE_URI=/tmp/mysql.conf
+```
+
+Setting up a sqlite database is a convient to setup :
+
 
 ```
      export SQLALCHEMY_DATABASE_URI=sqlite:////tmp/tmp.db # setup environment
-     flask colocalization init ${SQLALCHEMY_DATABASE_URI} # initialize database
-     flask colocalization load ${SQLALCHEMY_DATABASE_URI} <datafile> # load file into database
 ```
+
+Create the database schema if it doesn't exist the database :
+
+
+```
+     flask colocalization init ${SQLALCHEMY_DATABASE_URI} # create schema
+```
+
+Load a colocalization file into your database (has to start with a slash) :
+
+```
+     flask colocalization load ${SQLALCHEMY_DATABASE_URI} <datafile> # load data file into database
+```
+
+If you wish to delete the colocalization data from the database :
+
+```
+     flask colocalization delete ${SQLALCHEMY_DATABASE_URI} # delete schema
+```
+
 
 Additional commands
 
 ```
-     flask colocalization delete ${SQLALCHEMY_DATABASE_URI} # delete schema
-	 flask colocalization schema ${SQLALCHEMY_DATABASE_URI} # output schema
 	 flask colocalization --help # command help
+	 flask colocalization schema ${SQLALCHEMY_DATABASE_URI} # output schema
 ```
 
 
@@ -71,3 +105,4 @@ Install packages
 ```
    pip install .[dev]
 ```
+
