@@ -22,6 +22,7 @@ Setup environment
 ```
    export FLASK_APP=`pwd`/pheweb_colocalization/app.py
    export PYTHON_PATH=`pwd`
+   export RELEASE=10
 ```
 
 
@@ -43,6 +44,18 @@ In addition the path of a mysql configuration file can be specified and is often
 	export SQLALCHEMY_DATABASE_URI=/tmp/mysql.conf
 ```
 
+mysql conf template:
+
+```conf
+mysql = {
+     'host': '35.205.61.81',
+     'db': 'analysis_r10',
+     'user': 'pheweb_dev',
+     'password': 'RETRACTED',
+     'release': 10
+}
+```
+
 Setting up a sqlite database is a convient to setup :
 
 
@@ -60,7 +73,7 @@ Create the database schema if it doesn't exist the database :
 Load a colocalization file into your database (has to start with a slash) :
 
 ```
-     flask colocalization load ${SQLALCHEMY_DATABASE_URI} <datafile> # load data file into database
+     flask colocalization load ${RELEASE} ${SQLALCHEMY_DATABASE_URI} <datafile> # load data file into database
 ```
 
 If you wish to delete the colocalization data from the database :
