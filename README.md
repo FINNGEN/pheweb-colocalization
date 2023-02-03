@@ -72,6 +72,17 @@ Create the database schema if it doesn't exist the database :
 
 Load a colocalization file into your database (has to start with a slash) :
 
+The order of columns of the file to be loaded are specified below.
+
+> source1, source2, pheno1, pheno1\_description, pheno2, pheno2\_description, quant1, quant2, tissue1, tissue2, locus_id1, locus\_id2, chrom, start, stop, clpp, clpa, vars, len_cs1, len\_cs2, len_inter, vars1\_info, vars2\_info 
+
+The following command may help rearrange columns.
+
+```
+cat $FILE | sqlite3 -csv ':memory:' '.headers on' '.separator "\t"' '.mode tabs' '.import /dev/stdin data' 'select source1, source2, pheno1, pheno1\_description, pheno2, pheno2\_description, quant1, quant2, tissue1, tissue2, locus_id1, locus\_id2, chrom, start, stop, clpp, clpa, vars, len_cs1, len\_cs2, len_inter, vars1\_info, vars2\_info from data' 
+```
+
+
 ```
      flask colocalization load ${RELEASE} ${SQLALCHEMY_DATABASE_URI} <datafile> # load data file into database
 ```
