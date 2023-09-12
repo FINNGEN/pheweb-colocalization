@@ -74,13 +74,42 @@ Load a colocalization file into your database (has to start with a slash) :
 
 The order of columns of the file to be loaded are specified below.
 
-> source1, source2, pheno1, pheno1\_description, pheno2, pheno2\_description, quant1, quant2, tissue1, tissue2, locus_id1, locus\_id2, chrom, start, stop, clpp, clpa, vars, len_cs1, len\_cs2, len_inter, vars1\_info, vars2\_info 
+> source1, source2, pheno1, pheno1\_description, pheno2, pheno2\_description, quant1, quant2, tissue1, tissue2, locus_id1, locus\_id2, chrom, start, stop, clpp, clpa, vars, len_cs1, len\_cs2, len_inter, vars1\_info, vars2\_info, source2\_displayname 
 
 The following command may help rearrange columns.
 
 ```
-cat $FILE | sqlite3 -csv ':memory:' '.headers on' '.separator "\t"' '.mode tabs' '.import /dev/stdin data' 'select source1, source2, pheno1, pheno1\_description, pheno2, pheno2\_description, quant1, quant2, tissue1, tissue2, locus_id1, locus\_id2, chrom, start, stop, clpp, clpa, vars, len_cs1, len\_cs2, len_inter, vars1\_info, vars2\_info from data' 
+cat $FILE | sqlite3 -csv ':memory:' '.headers on' '.separator "\t"' '.mode tabs' '.import /dev/stdin data' 'select source1, source2, pheno1, pheno1\_description, pheno2, pheno2\_description, quant1, quant2, tissue1, tissue2, locus_id1, locus\_id2, chrom, start, stop, clpp, clpa, vars, len_cs1, len\_cs2, len_inter, vars1\_info, vars2\_info, source2\_displayname from data' 
 ```
+
+Alternatively, you can run workflow `wdl/format_colocs.wdl` in order to re-order columns, remove pvals from vars info, and add a source2_displayname column to the input colocalization files. Required inputs to the workflow are:
+- `format_coloc.input_files` (Array[File]) - an array of colocalization files prepared by colocalization workflow. 
+- `format_coloc.add_displayname` (Boolean) - specify whether to add `source2_displayname` column to each of the input colocalization files.
+- `format_coloc.add_displayname_column.src2_displayname_map` (File) - tab-separated two-column, source2 and source2_displayname, CSV file used for preparing `source2_displayname` column.
+- `format_coloc.reorder_columns` (Boolean) - specify whether to re-order columns (provide `format_coloc.reorder.cols_order` if the order is different from the default).
+- `format_coloc.reorder.cols_order` (String) - tab-separated two-column, source2 and source2_displayname, CSV file used for preparing source2_displayname column, default columns string: "source1,source2,pheno1,pheno1_description,pheno2,pheno2_description,quant1,quant2,tissue1,tissue2,locus_id1,locus_id2,chrom,start,stop,clpp,clpa,vars,len_cs1,len_cs2,len_inter,vars1_info,vars2_info,source2_displayname".
+- `format_coloc.remove_pvals_from_vars_info_column` (Boolean) - specify whether to remove p-values from from vars_info column.
+
+Sample CSV file used as input in `format_coloc.add_displayname_column.src2_displayname_map`:
+```
+source2 source2_displayname
+FinnGen FinnGen
+geneRISK        geneRISK
+INTERVAL        INTERVAL
+UKBB    UKBB
+Olink   FinnGen Olink batch 1,2
+SomaScan        FinnGen Somascan batch 1,2
+Alasoo_2018     Alasoo_2018 (eQTL Catalog, RNA-seq data)
+BLUEPRINT       BLUEPRINT (eQTL Catalog, RNA-seq data)
+BrainSeq        BrainSeq (eQTL Catalog, RNA-seq data)
+CEDAR   CEDAR (eQTL Catalog, Microarray data)
+Fairfax_2012    Fairfax_2012 (eQTL Catalog, Microarray data)
+Fairfax_2014    Fairfax_2014 (eQTL Catalog, Microarray data)
+GENCORD GENCORD (eQTL Catalog, RNA-seq data)
+...
+```
+
+The outputs of the workflow can be used for the loading to the db using the command below.
 
 
 ```
