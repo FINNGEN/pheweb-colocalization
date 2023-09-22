@@ -93,7 +93,7 @@ task add_displayname_column {
     }
 
     runtime {
-        docker: "amancevice/pandas:slim"
+        docker: "amancevice/pandas:2.1.0"
         cpu: "1"
         memory: "8 GB"
         disks: "local-disk ${disk_size} HDD"
