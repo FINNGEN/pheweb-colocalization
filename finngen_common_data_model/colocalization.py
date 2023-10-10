@@ -392,10 +392,10 @@ class Colocalization(Kwargs, JSONifiable):
 
                                         source2_displayname=nvl(line[23], str),
 
-                                        beta1=nvl(line[23], float),
-                                        beta2=nvl(line[24], float),
-                                        pval1=nvl(line[25], float),
-                                        pval2=nvl(line[26], float),
+                                        beta1=nvl(line[24], float),
+                                        beta2=nvl(line[25], float),
+                                        pval1=nvl(line[26], float),
+                                        pval2=nvl(line[27], float),               
 
                                         variants=variants,
 
