@@ -256,6 +256,11 @@ class Colocalization(Kwargs, JSONifiable):
 
     source2_displayname = attr.ib(validator=instance_of(str))
 
+    beta1 = attr.ib(validator=instance_of(float))
+    beta2 = attr.ib(validator=instance_of(float))
+    pval1 = attr.ib(validator=instance_of(float))
+    pval2 = attr.ib(validator=instance_of(float))
+
     variants = attr.ib(validator=attr.validators.deep_iterable(member_validator=instance_of(CausalVariant),
                                                                iterable_validator=instance_of(typing.List)))
 
@@ -284,7 +289,11 @@ class Colocalization(Kwargs, JSONifiable):
                             'len_inter',
                             'vars1_info',
                             'vars2_info',
-                            'source2_displayname')
+                            'source2_displayname',
+                            'beta1',
+                            'beta2',
+                            'pval1',
+                            'pval2')
 
     @staticmethod
     def cvs_column_names() -> typing.List[str]:
@@ -306,7 +315,8 @@ class Colocalization(Kwargs, JSONifiable):
                                                     "locus",
                                                     "clpp", "clpa",
                                                     "len_cs1", "len_cs2", "len_inter", 
-                                                    "source2_displayname",
+                                                    "source2_displayname", 
+                                                    "beta1", "beta2", "pval1", "pval2",
                                                     "colocalization_id"]}
         c["variants"] = list(map(lambda v: CausalVariant(**v.kwargs_rep()), self.variants))
         return c
@@ -339,6 +349,7 @@ class Colocalization(Kwargs, JSONifiable):
         11..15 chromosome, start, stop, clpp, clpa
         16..20 beta_id1, beta_id2, variation, vars_pip1, vars_pip2
         21..26 vars_beta1, vars_beta2, len_cs1, len_cs2, len_inter, source2_displayname
+        27..30 beta1, beta2, pval1, pval2
 
         :param colocalization_id: colocalization id
         :param line: string array with value
@@ -380,6 +391,11 @@ class Colocalization(Kwargs, JSONifiable):
                                         len_inter=nvl(line[20], na(int)),
 
                                         source2_displayname=nvl(line[23], str),
+
+                                        beta1=nvl(line[23], float),
+                                        beta2=nvl(line[24], float),
+                                        pval1=nvl(line[25], float),
+                                        pval2=nvl(line[26], float),
 
                                         variants=variants,
 
@@ -425,5 +441,12 @@ class Colocalization(Kwargs, JSONifiable):
                 Column('{}len_cs2'.format(prefix), Integer, unique=False, nullable=False),
                 Column('{}len_inter'.format(prefix), Integer, unique=False, nullable=False),
 
-                Column('{}source2_displayname'.format(prefix), String(1000), unique=False, nullable=True)]
+                Column('{}source2_displayname'.format(prefix), String(1000), unique=False, nullable=True),
+
+                Column('{}beta1'.format(prefix), Float, unique=False, nullable=False),
+                Column('{}beta2'.format(prefix), Float, unique=False, nullable=False),
+                Column('{}pval1'.format(prefix), Float, unique=False, nullable=False),
+                Column('{}pval2'.format(prefix), Float, unique=False, nullable=False)
+                
+                ]
     
