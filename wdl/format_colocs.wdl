@@ -106,7 +106,7 @@ task add_displayname_column {
 task reorder {
 
     File file
-    String cols_order = "source1,source2,pheno1,pheno1_description,pheno2,pheno2_description,quant1,quant2,tissue1,tissue2,locus_id1,locus_id2,chrom,start,stop,clpp,clpa,vars,len_cs1,len_cs2,len_inter,vars1_info,vars2_info,source2_displayname"
+    String cols_order
     String fout = basename(file)
     Int disk_size = ceil(size(file, "GB")) * 5 + 10
 
