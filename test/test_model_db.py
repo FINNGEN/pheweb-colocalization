@@ -72,7 +72,14 @@ def test_can_insert():
                                     len_cs2 = 15,
                                     len_inter = 16,
 
-                                    source2_displayname = "source2_displayname",)
+                                    source2_displayname = "source2_displayname",
+
+                                    beta1 = 0.1,
+                                    beta2 = -0.1,
+                                    pval1 = 0.001,
+                                    pval2 = 0.005,
+                                    
+                                    )
 
     dao.save(colocalization)
     results = dao.get_variant(phenotype1, Variant.from_str("chr1_2_A_C"))

@@ -12,5 +12,5 @@
 "format_coloc.reorder_columns": true,
 "format_coloc.remove_pvals_from_vars_info_column": true,
 "format_coloc.add_displayname_column.src2_displayname_map": "gs://PATH/TO/source2_displayname_map.csv",
-"format_coloc.reorder.cols_order": "source1,source2,pheno1,pheno1_description,pheno2,pheno2_description,quant1,quant2,tissue1,tissue2,locus_id1,locus_id2,chrom,start,stop,clpp,clpa,vars,len_cs1,len_cs2,len_inter,vars1_info,vars2_info,source2_displayname"
+"format_coloc.reorder.cols_order": "source1,source2,pheno1,pheno1_description,pheno2,pheno2_description,quant1,quant2,tissue1,tissue2,locus_id1,locus_id2,chrom,start,stop,clpp,clpa,vars,len_cs1,len_cs2,len_inter,vars1_info,vars2_info,source2_displayname,beta1,beta2,pval1,pval2"
 }
