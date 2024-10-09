@@ -329,7 +329,7 @@ class Colocalization(Kwargs, JSONifiable):
                                                     "clpp", "clpa",
                                                     "len_cs1", "len_cs2", "len_inter", 
                                                     "source2_displayname", 
-                                                    "beta1", "beta2", "pval1", "pval2", 'PP.H4.abf',
+                                                    "beta1", "beta2", "pval1", "pval2", 'pp_h4_abf',
                                                     "colocalization_id"]}
         c["variants"] = list(map(lambda v: CausalVariant(**v.kwargs_rep()), self.variants))
         return c
