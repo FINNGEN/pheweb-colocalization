@@ -19,11 +19,11 @@ class CausalVariant(JSONifiable, Kwargs):
     """
     rel = attr.ib(validator=instance_of(int))
     
-    pip1 = attr.ib(validator=attr.validators.optional(instance_of(float)))
-    beta1 = attr.ib(validator=attr.validators.optional(instance_of(float)))
+    pip1 = attr.ib(validator=attr.validators.optional(instance_of(float)), default=None)
+    beta1 = attr.ib(validator=attr.validators.optional(instance_of(float)), default=None)
 
-    pip2 = attr.ib(validator=attr.validators.optional(instance_of(float)))
-    beta2 = attr.ib(validator=attr.validators.optional(instance_of(float)))
+    pip2 = attr.ib(validator=attr.validators.optional(instance_of(float)), default=None)
+    beta2 = attr.ib(validator=attr.validators.optional(instance_of(float)), default=None)
 
     causal_variant_id = attr.ib(validator=attr.validators.optional(instance_of(int)), default=None)
 
@@ -141,7 +141,17 @@ class CausalVariant(JSONifiable, Kwargs):
         :return:
         """
         variant, pip, beta = x.split(",")
-        return float(pip), float(beta)
+        if pip is None or pip == "" or pip == "NA":
+            pip = None
+        else:
+            pip = float(pip)
+        
+        if beta is None or beta == "" or beta == "NA":
+            beta = None
+        else:
+            beta = float(beta)
+            
+        return pip, beta
 
     @staticmethod
     def from_list(rel : str,
@@ -247,24 +257,26 @@ class Colocalization(Kwargs, JSONifiable):
 
     locus = attr.ib(validator=instance_of(Locus))
 
-    clpp = attr.ib(validator=instance_of(float))
-    clpa = attr.ib(validator=instance_of(float))
-
     len_cs1 = attr.ib(validator=instance_of(int))
     len_cs2 = attr.ib(validator=instance_of(int))
     len_inter = attr.ib(validator=instance_of(int))
 
     source2_displayname = attr.ib(validator=instance_of(str))
-
-    beta1 = attr.ib(validator=instance_of(float))
-    beta2 = attr.ib(validator=instance_of(float))
-    pval1 = attr.ib(validator=instance_of(float))
-    pval2 = attr.ib(validator=instance_of(float))
+    pp_h4_abf = attr.ib(validator=instance_of(float))
 
     variants = attr.ib(validator=attr.validators.deep_iterable(member_validator=instance_of(CausalVariant),
                                                                iterable_validator=instance_of(typing.List)))
 
     colocalization_id = attr.ib(validator=attr.validators.optional(instance_of(int)), default=None)
+
+    clpp = attr.ib(validator=attr.validators.optional(instance_of(float)), default=None)
+    clpa = attr.ib(validator=attr.validators.optional(instance_of(float)), default=None)
+    
+    beta1 = attr.ib(validator=attr.validators.optional(instance_of(float)), default=None)
+    beta2 = attr.ib(validator=attr.validators.optional(instance_of(float)), default=None)
+    
+    pval1 = attr.ib(validator=attr.validators.optional(instance_of(float)), default=None)
+    pval2 = attr.ib(validator=attr.validators.optional(instance_of(float)), default=None)
 
     _IMPORT_COLUMN_NAMES = ('source1',
                             'source2',
@@ -293,7 +305,8 @@ class Colocalization(Kwargs, JSONifiable):
                             'beta1',
                             'beta2',
                             'pval1',
-                            'pval2')
+                            'pval2',
+                            'PP.H4.abf')
 
     @staticmethod
     def cvs_column_names() -> typing.List[str]:
@@ -316,7 +329,7 @@ class Colocalization(Kwargs, JSONifiable):
                                                     "clpp", "clpa",
                                                     "len_cs1", "len_cs2", "len_inter", 
                                                     "source2_displayname", 
-                                                    "beta1", "beta2", "pval1", "pval2",
+                                                    "beta1", "beta2", "pval1", "pval2", 'PP.H4.abf',
                                                     "colocalization_id"]}
         c["variants"] = list(map(lambda v: CausalVariant(**v.kwargs_rep()), self.variants))
         return c
@@ -349,7 +362,7 @@ class Colocalization(Kwargs, JSONifiable):
         11..15 chromosome, start, stop, clpp, clpa
         16..20 beta_id1, beta_id2, variation, vars_pip1, vars_pip2
         21..26 vars_beta1, vars_beta2, len_cs1, len_cs2, len_inter, source2_displayname
-        27..30 beta1, beta2, pval1, pval2
+        27..31 beta1, beta2, pval1, pval2, pp_h4_abf
 
         :param colocalization_id: colocalization id
         :param line: string array with value
@@ -395,7 +408,9 @@ class Colocalization(Kwargs, JSONifiable):
                                         beta1=nvl(line[24], float),
                                         beta2=nvl(line[25], float),
                                         pval1=nvl(line[26], float),
-                                        pval2=nvl(line[27], float),               
+                                        pval2=nvl(line[27], float),   
+
+                                        pp_h4_abf=nvl(line[28], float),               
 
                                         variants=variants,
 
@@ -434,8 +449,8 @@ class Colocalization(Kwargs, JSONifiable):
                 # locus
                 *Locus.columns(''),
 
-                Column('{}clpp'.format(prefix), Float, unique=False, nullable=False),
-                Column('{}clpa'.format(prefix), Float, unique=False, nullable=False),
+                Column('{}clpp'.format(prefix), Float, unique=False, nullable=True),
+                Column('{}clpa'.format(prefix), Float, unique=False, nullable=True),
 
                 Column('{}len_cs1'.format(prefix), Integer, unique=False, nullable=False),
                 Column('{}len_cs2'.format(prefix), Integer, unique=False, nullable=False),
@@ -443,10 +458,12 @@ class Colocalization(Kwargs, JSONifiable):
 
                 Column('{}source2_displayname'.format(prefix), String(1000), unique=False, nullable=True),
 
-                Column('{}beta1'.format(prefix), Float, unique=False, nullable=False),
-                Column('{}beta2'.format(prefix), Float, unique=False, nullable=False),
-                Column('{}pval1'.format(prefix), Float, unique=False, nullable=False),
-                Column('{}pval2'.format(prefix), Float, unique=False, nullable=False)
+                Column('{}beta1'.format(prefix), Float, unique=False, nullable=True),
+                Column('{}beta2'.format(prefix), Float, unique=False, nullable=True),
+                Column('{}pval1'.format(prefix), Float, unique=False, nullable=True),
+                Column('{}pval2'.format(prefix), Float, unique=False, nullable=True),
+
+                Column('{}pp_h4_abf'.format(prefix), Float, unique=False, nullable=False),
                 
                 ]
     
